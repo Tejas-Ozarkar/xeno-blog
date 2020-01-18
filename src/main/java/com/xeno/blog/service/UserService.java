@@ -1,6 +1,5 @@
 package com.xeno.blog.service;
 
-import com.sun.deploy.net.HttpResponse;
 import com.xeno.blog.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -14,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class UserService implements UserDetailsService {
@@ -23,15 +23,6 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder bcryptEncoder;
-
-    public void postUser(){
-        User user = new User();
-        user.setFirstName("Tejas");
-        user.setLastName("O");
-        user.setUsername("tejozarkar");
-        user.setPassword("tejas");
-        mongoOperations.save(user);
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -52,5 +43,9 @@ public class UserService implements UserDetailsService {
         newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
         mongoOperations.save(newUser);
         return ResponseEntity.status(200).body("User Created");
+    }
+
+    public List<User> getAllUsers() {
+        return mongoOperations.findAll(User.class);
     }
 }
