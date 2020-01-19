@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,6 +37,11 @@ public class UserService implements UserDetailsService {
                 new ArrayList<>());
     }
 
+    public User findById(String id){
+        return mongoOperations.findById(id, User.class
+        );
+    }
+
     public ResponseEntity<String> register(User user){
         User newUser = new User();
         newUser.setFirstName(user.getFirstName());
@@ -48,4 +55,12 @@ public class UserService implements UserDetailsService {
     public List<User> getAllUsers() {
         return mongoOperations.findAll(User.class);
     }
+
+    public User getAuthorizeUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Query searchQuery = new Query(Criteria.where("username").is(username));
+        return mongoOperations.findOne(searchQuery, User.class);
+    }
+
 }
